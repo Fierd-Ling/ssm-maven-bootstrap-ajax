@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>index</title>
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!-- Bootstrap -->
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet">
+    <script src="jquery-3.3.1.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            listTablePage(1);
+            $("#Next").click(function () {
+                var NowPage = parseInt($("#NowPage").val());
+                /*需要总页数判断*/
+                var pages = parseInt($("#pages").val());
+                if(NowPage==pages){
+                    alert("已经是最后一页");
+                    return;
+                }
+                var NextPage = NowPage + 1;
+                listTablePage(NextPage);
+                $("#NowPage").val(NextPage);
+                return;
+            });
+            $("#Previous").click(function () {
+                var NowPage = parseInt($("#NowPage").val());
+                 console.log(NowPage);
+                if (NowPage == 1) {
+                    alert("已经是one");
+                    return;
+                }
+                var NextPage = NowPage - 1;
+                listTablePage(NextPage);
+                $("#NowPage").val(NextPage);
+                return;
+            });
+            function listTablePage(page) {
+                $.ajax({
+                    type: "post",
+                    /* 添加这个dataType自动转换为数组类型否则依然是json串*/
+                    dataType: "json",
+                    url: "excel/page.do",
+                    data: {
+                        "page": page
+                    },
+                    success: function (pageInfo) {
+                        var listBody = $("#listBody");
+                         /*清空之前的*/
+                         listBody.empty();
+                         // 拿到pageInfo对象里面的参数
+                         var listExcel=pageInfo.list;
+                         var pages=pageInfo.pages;
+                         var total=pageInfo.total;
+                         $("#pages").val(pages);
+                         $("#total").val(total);
+                         var length = listExcel.length;
+                         console.log(listExcel);
+                          for (var x = 0; x < length; x++) {
+                         /*使用拼接*/
+                         var str = "<tr>" +
+                         "<td>" + listExcel[x].number + "</td>" +
+                         "<td>" + listExcel[x].name + "</td>" +
+                         "<td>" + listExcel[x].department + "</td>" +
+                         "<td>" + listExcel[x].email + "</td>"
+                         "</tr>";
+                         listBody.append(str);
+                         }
+                         return;
+                    }
+                });
+            }
+        })
+
+    </script>
+
+    <style type="text/css">
+        #box {
+            height: 500px;
+            border: 1px solid blueviolet;
+        }
+
+        #table {
+            width: 100%;
+            background: bisque;
+            text-align: center;
+        }
+
+        #rowTip {
+            height: 30px;
+            color: olivedrab;
+            line-height: 30px;
+            font-size: 25px;
+            background: darkgrey;
+        }
+
+        #page li:hover {
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-2"></div>
+        <div class="col-md-8" id="box">
+            <table class="table table-striped" id="table">
+                <tr id="rowTip">
+                    <td>工号</td>
+                    <td>名字</td>
+                    <td>部门</td>
+                    <td>邮箱</td>
+                </tr>
+                <tbody id="listBody"></tbody>
+            </table>
+            <nav aria-label="Page navigation" id="page">
+                <ul class="pagination">
+                    <li>
+
+                        <span aria-hidden="true" id="Previous">&laquo;</span>
+
+                    </li>
+                    现在页数<input type="text" value=1 id="NowPage" ><!--style="display: none"-->
+                    总共条数<input type="text" value=0 id="total" disabled>
+                    总共页数<input type="text" value=0 id="pages" disabled>
+                    <li>
+
+                        <span aria-hidden="true" id="Next">&raquo;</span>
+
+                    </li>
+                </ul>
+            </nav>
+
+
+        </div>
+        <div class="col-md-2">
+        </div>
+    </div>
+
+</div>
+
+</body>
+</html>
